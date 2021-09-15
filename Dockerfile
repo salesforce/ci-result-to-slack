@@ -1,5 +1,5 @@
 FROM gcr.io/distroless/base-debian11
 
-COPY ./bin/ci-result-to-slack /ci-result-to-slack
+COPY ./ci-result-to-slack /ci-result-to-slack
 
 ENTRYPOINT ["/ci-result-to-slack"]

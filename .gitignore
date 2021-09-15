@@ -2,5 +2,5 @@
 .idea
 
 # Build / CI artifacts
-bin
+/ci-result-to-slack
 coverage.out

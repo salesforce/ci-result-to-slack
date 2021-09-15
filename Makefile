@@ -8,7 +8,7 @@ ci: build test
 
 build: clean
 	@echo "Building..."
-	CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -o bin/$(BINARY_NAME) ./cmd/$(BINARY_NAME)/main.go
+	CGO_ENABLED=0 GOOS=linux GO111MODULE=on go build -o $(BINARY_NAME) ./cmd/$(BINARY_NAME)/main.go
 
 test: clean
 	@echo "Running unit tests..."
@@ -23,7 +23,7 @@ lint:
 
 clean:
 	@echo "Cleaning..."
-	rm -rf ./bin/$(BINARY_NAME)
+	rm -rf .$(BINARY_NAME)
 	rm -rf coverage.out
 
 local-docker-test: ## Build and run unit tests in docker container like CI without building the container
