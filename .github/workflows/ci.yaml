@@ -27,3 +27,9 @@ jobs:
         run: make ci
       - name: docker build
         run: make local-docker-build
+      - name: GoReleaser Build
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          distribution: goreleaser
+          version: latest
+          args: build --rm-dist
