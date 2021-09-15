@@ -1,0 +1,6 @@
+# GoLand
+.idea
+
+# Build / CI artifacts
+bin
+coverage.out

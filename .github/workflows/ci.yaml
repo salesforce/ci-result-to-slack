@@ -1,0 +1,23 @@
+name: 'ci'
+on:
+  push:
+    paths-ignore:
+      - 'CODE_OF_CONDUCT.md'
+      - 'LICENSE.txt'
+      - 'README.md'
+      - 'SECURITY.md'
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+        with:
+          ref: ${{ github.ref }}
+      - name: docker build and test
+        run: make local-docker-build
