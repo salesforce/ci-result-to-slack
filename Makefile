@@ -14,7 +14,7 @@ test: clean
 	@echo "Running unit tests..."
 	go test -race -coverprofile=coverage.out ./...
 
-lint: clean
+lint:
 	@echo "Check format..."
 	$(eval NEED_TO_FORMAT := $(shell go fmt ./...))
 	@test -z "$(NEED_TO_FORMAT)" || (echo "Need to format the following (done for you already locally): $(NEED_TO_FORMAT)" && exit 1)
@@ -23,7 +23,7 @@ lint: clean
 
 clean:
 	@echo "Cleaning..."
-	rm -rf $(BINARY_NAME)
+	rm -rf ./bin/$(BINARY_NAME)
 	rm -rf coverage.out
 
 local-docker-test: ## Build and run unit tests in docker container like CI without building the container
