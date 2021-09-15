@@ -32,4 +32,4 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: build --snapshot --rm-dist
+          args: release --skip-publish --snapshot --rm-dist
