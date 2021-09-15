@@ -29,5 +29,5 @@ clean:
 local-docker-test: ## Build and run unit tests in docker container like CI without building the container
 	docker run --rm=true -v `pwd`:$(MOUNT_DIR) $(BUILD_CONTAINER) bash -c 'cd $(MOUNT_DIR) && make ci'
 
-local-docker-build: ## Build the container image (which also runs tests)
+local-docker-build: ## Build the container image
 	docker build --no-cache -t $(ORG_AND_REPO) .
