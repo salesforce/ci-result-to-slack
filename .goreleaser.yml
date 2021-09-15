@@ -2,7 +2,6 @@ project_name: ci-result-to-slack
 builds:
   - env: [CGO_ENABLED=0]
     main: ./cmd/ci-result-to-slack
-    binary: bin/ci-result-to-slack
     goos:
       - linux
       - windows
