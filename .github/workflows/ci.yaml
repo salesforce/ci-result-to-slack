@@ -32,8 +32,6 @@ jobs:
             ${{ runner.os }}-go-
       - name: build and test binary
         run: make ci
-      - name: docker build
-        run: make local-docker-build
       - name: GoReleaser Build
         uses: goreleaser/goreleaser-action@v2
         with:
