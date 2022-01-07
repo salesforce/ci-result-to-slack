@@ -1,0 +1,9 @@
+[project]
+id = "com.salesforce.ci-result-to-slack"
+name = "ci-result-to-slack"
+authors = ["Justin Harringa"]
+documentation-url = "https://github.com/salesforce/ci-result-to-slack#readme"
+source-url = "https://github.com/salesforce/ci-result-to-slack"
+
+[[project.licenses]]
+type = "BSD-3-Clause"
