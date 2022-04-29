@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/slack-go/slack v0.10.2
+	github.com/slack-go/slack v0.10.3
 )
 
 require (
