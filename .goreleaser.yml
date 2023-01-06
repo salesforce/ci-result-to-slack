@@ -1,6 +1,19 @@
 project_name: ci-result-to-slack
+env:
+  - BP_OCI_TITLE={{ .ProjectName }}
+  - BP_OCI_AUTHORS=Justin Harringa <jharringa@salesforce.com>
+  - BP_OCI_DESCRIPTION=Send your CI result to Slack upon pipeline completion
+  - BP_OCI_URL=https://github.com/salesforce/ci-result-to-slack
+  - BP_OCI_SOURCE=https://github.com/salesforce/ci-result-to-slack
+  - BP_OCI_DOCUMENTATION=https://github.com/salesforce/ci-result-to-slack/blob/main/README.md
+  - BP_OCI_REVISION={{ .FullCommit }}
+  - BP_OCI_VERSION={{ .Version }}
+  - BP_OCI_CREATED={{ time "2006-01-02T15:04:05Z07:00" }}
+  - BP_OCI_LICENSES=BSD-3-Clause
+  - BP_OCI_VENDOR=Salesforce.com
 builds:
-  - env: [CGO_ENABLED=0]
+  - env: 
+      - CGO_ENABLED=0
     main: ./cmd/ci-result-to-slack
     goos:
       - linux
@@ -11,16 +24,21 @@ builds:
       - arm64
 dockers:
   - image_templates: ["ghcr.io/salesforce/ci-result-to-slack:{{ .Version }}"]
-    dockerfile: Dockerfile
+    use: buildpacks
     build_flag_templates:
-      - --label=org.opencontainers.image.title={{ .ProjectName }}
-      - --label=org.opencontainers.image.description={{ .ProjectName }}
-      - --label=org.opencontainers.image.url=https://github.com/salesforce/ci-result-to-slack
-      - --label=org.opencontainers.image.source=https://github.com/salesforce/ci-result-to-slack
-      - --label=org.opencontainers.image.version={{ .Version }}
-      - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
-      - --label=org.opencontainers.image.revision={{ .FullCommit }}
-      - --label=org.opencontainers.image.licenses=BSD-3-Clause
+    - --env=BP_OCI_TITLE
+    - --env=BP_OCI_AUTHORS
+    - --env=BP_OCI_DESCRIPTION
+    - --env=BP_OCI_URL
+    - --env=BP_OCI_SOURCE
+    - --env=BP_OCI_DOCUMENTATION
+    - --env=BP_OCI_VERSION
+    - --env=BP_OCI_VENDOR
+    - --env=BP_OCI_CREATED
+    - --env=BP_OCI_REVISION
+    - --env=BP_OCI_LICENSES
+    - --env=BP_OCI_URL
+    - --buildpack=gcr.io/paketo-buildpacks/image-labels
 nfpms:
   - maintainer: Justin Harringa <jharringa@salesforce.com>
     description: Send your CI result to Slack upon pipeline completion
