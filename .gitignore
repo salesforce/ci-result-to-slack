@@ -4,3 +4,4 @@
 # Build / CI artifacts
 /ci-result-to-slack
 coverage.out
+/dist

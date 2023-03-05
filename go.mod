@@ -1,6 +1,6 @@
 module github.com/salesforce/ci-result-to-slack
 
-go 1.17
+go 1.20
 
 require (
 	github.com/kelseyhightower/envconfig v1.4.0

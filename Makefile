@@ -2,7 +2,7 @@
 
 ORG_AND_REPO=salesforce/ci-results-to-slack
 MOUNT_DIR=/go/src/github.com/${ORG_AND_REPO}
-BUILD_CONTAINER=golang:1.17-bullseye
+BUILD_CONTAINER=golang:1.20-bullseye
 BINARY_NAME=ci-result-to-slack
 ci: build test
 
@@ -23,11 +23,12 @@ lint:
 
 clean:
 	@echo "Cleaning..."
-	rm -rf .$(BINARY_NAME)
+	rm -rf $(BINARY_NAME)
 	rm -rf coverage.out
 
 local-docker-test: ## Build and run unit tests in docker container like CI without building the container
 	docker run --rm=true -v `pwd`:$(MOUNT_DIR) $(BUILD_CONTAINER) bash -c 'cd $(MOUNT_DIR) && make ci'
 
 local-docker-build: ## Build the container image
+	docker run --rm=true -v `pwd`:$(MOUNT_DIR) $(BUILD_CONTAINER) bash -c 'cd $(MOUNT_DIR) && make build'
 	docker build --no-cache -t $(ORG_AND_REPO) .
