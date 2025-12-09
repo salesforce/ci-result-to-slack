@@ -26,8 +26,8 @@ jobs:
       - name: build and test binary
         run: make ci
       - name: GoReleaser Build
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest
-          args: release --skip-publish --snapshot --rm-dist
+          args: release --skip=publish --snapshot --clean
