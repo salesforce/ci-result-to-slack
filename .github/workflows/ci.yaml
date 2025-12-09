@@ -30,4 +30,4 @@ jobs:
         with:
           distribution: goreleaser
           version: latest
-          args: release --skip-publish --snapshot --rm-dist
+          args: release --skip=publish --snapshot --clean
