@@ -88,3 +88,63 @@ func Test_GetContextualStatus(t *testing.T) {
 		})
 	}
 }
+
+func Test_ShouldSkipPosting(t *testing.T) {
+	tests := []struct {
+		name           string
+		buildInfo      BuildInfo
+		expectedResult bool
+	}{
+		{
+			"should skip when SkipIfSuccess=true and status is success",
+			BuildInfo{BuildStatus: successKey, SkipIfSuccess: true},
+			true,
+		},
+		{
+			"should NOT skip when status is fixed (success after failure) - fixed is newsworthy",
+			BuildInfo{BuildStatus: successKey, LastBuildStatus: failureKey, SkipIfSuccess: true},
+			false,
+		},
+		{
+			"should NOT skip when SkipIfSuccess=false",
+			BuildInfo{BuildStatus: successKey, SkipIfSuccess: false},
+			false,
+		},
+		{
+			"should NOT skip when SkipIfSuccess=true but status is failure",
+			BuildInfo{BuildStatus: failureKey, SkipIfSuccess: true},
+			false,
+		},
+		{
+			"should NOT skip when SkipIfSuccess=true but status is unstable",
+			BuildInfo{BuildStatus: unstableKey, SkipIfSuccess: true},
+			false,
+		},
+		{
+			"should NOT skip when SkipIfSuccess=true but status is still failing",
+			BuildInfo{BuildStatus: failureKey, LastBuildStatus: failureKey, SkipIfSuccess: true},
+			false,
+		},
+		{
+			"should NOT skip when SkipIfSuccess=true but status is unknown",
+			BuildInfo{BuildStatus: "UNKNOWN", SkipIfSuccess: true},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.buildInfo.ShouldSkipPosting(); got != tt.expectedResult {
+				t.Errorf("ShouldSkipPosting() = %v, want %v", got, tt.expectedResult)
+			}
+		})
+	}
+}
+
+func Test_GetBuildInfoFromEnv_UsageOutput(t *testing.T) {
+	// Don't set SUPPRESS_USAGE, so usage will be printed to stderr
+	// This tests the error path where usage is displayed
+	_, err := GetBuildInfoFromEnv()
+	if err == nil {
+		t.Error("Expected error when required environment variables missing")
+	}
+}
