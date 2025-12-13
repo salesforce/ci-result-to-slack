@@ -1,6 +1,10 @@
 # CI Results to Slack
 
-This project has been built as a somewhat CI agnostic approach to posting 
+[![CodeQL](https://github.com/salesforce/ci-result-to-slack/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/salesforce/ci-result-to-slack/actions/workflows/codeql-analysis.yml)
+[![Build + Test](https://github.com/salesforce/ci-result-to-slack/actions/workflows/ci.yaml/badge.svg)](https://github.com/salesforce/ci-result-to-slack/actions/workflows/ci.yaml)
+[![golangci-lint](https://github.com/salesforce/ci-result-to-slack/actions/workflows/golangci-lint.yaml/badge.svg)](https://github.com/salesforce/ci-result-to-slack/actions/workflows/golangci-lint.yaml)
+
+This project has been built as a somewhat CI agnostic approach to posting
 build results to Slack. Some of the plugins for CI servers work great in an environment
 where you don't have proxy requirements but not so great when some of the tradeoffs are that
 you have to open the proxies up for the whole CI system (Jenkins). Granted, there are knobs
