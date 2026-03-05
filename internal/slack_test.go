@@ -318,6 +318,107 @@ func Test_getPostMessage(t *testing.T) {
 	// This ensures the function executes and returns the expected slice structure
 }
 
+// fakeSlackAPI is a test double for the slackAPI interface.
+type fakeSlackAPI struct {
+	capturedChannelID string
+	capturedOptions   []slack.MsgOption
+	err               error
+}
+
+func (f *fakeSlackAPI) PostMessage(channelID string, options ...slack.MsgOption) (string, string, error) {
+	f.capturedChannelID = channelID
+	f.capturedOptions = options
+	return "", "", f.err
+}
+
+func Test_productionSlackClientWorker_postChannelMessage(t *testing.T) {
+	t.Run("calls PostMessage with correct channelID and non-empty options", func(t *testing.T) {
+		fakeAPI := &fakeSlackAPI{}
+		worker := &productionSlackClientWorker{
+			apiFactory: func(token string) slackAPI { return fakeAPI },
+		}
+		buildInfo := BuildInfo{
+			JobName:       "test-job",
+			BuildURL:      "https://example.com",
+			BuildStatus:   successKey,
+			OauthToken:    "token",
+			DestChannelId: "C12345",
+		}
+		err := worker.postChannelMessage(buildInfo)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+		if fakeAPI.capturedChannelID != "C12345" {
+			t.Errorf("expected channelID %q, got %q", "C12345", fakeAPI.capturedChannelID)
+		}
+		if len(fakeAPI.capturedOptions) == 0 {
+			t.Error("expected non-empty message options")
+		}
+	})
+
+	t.Run("propagates error from PostMessage", func(t *testing.T) {
+		fakeAPI := &fakeSlackAPI{err: fmt.Errorf("api error")}
+		worker := &productionSlackClientWorker{
+			apiFactory: func(token string) slackAPI { return fakeAPI },
+		}
+		buildInfo := BuildInfo{
+			OauthToken:    "token",
+			DestChannelId: "C12345",
+			BuildStatus:   successKey,
+		}
+		err := worker.postChannelMessage(buildInfo)
+		if err == nil || err.Error() != "api error" {
+			t.Errorf("expected 'api error', got %v", err)
+		}
+	})
+}
+
+func Test_productionSlackClientWorker_postWebhookMessage(t *testing.T) {
+	t.Run("calls webhookPoster with correct URL and non-nil message", func(t *testing.T) {
+		var capturedURL string
+		var capturedMsg *slack.WebhookMessage
+		worker := &productionSlackClientWorker{
+			webhookPoster: func(url string, msg *slack.WebhookMessage) error {
+				capturedURL = url
+				capturedMsg = msg
+				return nil
+			},
+		}
+		buildInfo := BuildInfo{
+			JobName:     "test-job",
+			BuildURL:    "https://example.com",
+			BuildStatus: successKey,
+			HookURL:     "https://hooks.slack.com/test",
+		}
+		err := worker.postWebhookMessage(buildInfo)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+		if capturedURL != "https://hooks.slack.com/test" {
+			t.Errorf("expected URL %q, got %q", "https://hooks.slack.com/test", capturedURL)
+		}
+		if capturedMsg == nil {
+			t.Error("expected non-nil webhook message")
+		}
+	})
+
+	t.Run("propagates error from webhookPoster", func(t *testing.T) {
+		worker := &productionSlackClientWorker{
+			webhookPoster: func(url string, msg *slack.WebhookMessage) error {
+				return fmt.Errorf("webhook error")
+			},
+		}
+		buildInfo := BuildInfo{
+			HookURL:     "https://hooks.slack.com/test",
+			BuildStatus: successKey,
+		}
+		err := worker.postWebhookMessage(buildInfo)
+		if err == nil || err.Error() != "webhook error" {
+			t.Errorf("expected 'webhook error', got %v", err)
+		}
+	})
+}
+
 func Test_NewSlackClient(t *testing.T) {
 	client := NewSlackClient()
 	if client.slackClient == nil {
@@ -384,6 +485,31 @@ func Test_PostToSlack_EdgeCases(t *testing.T) {
 			NewTestClient(false, false),
 			true,
 			PickRunModeErrorMessage,
+		},
+		{
+			"channel message client returns error - PostToSlack propagates it",
+			BuildInfo{
+				JobName:       "job",
+				BuildURL:      "url",
+				BuildStatus:   "SUCCESS",
+				OauthToken:    "token",
+				DestChannelId: "channel",
+			},
+			NewTestClient(true, false),
+			true,
+			ChannelMessageTestErr,
+		},
+		{
+			"webhook client returns error - PostToSlack propagates it",
+			BuildInfo{
+				JobName:     "job",
+				BuildURL:    "url",
+				BuildStatus: "SUCCESS",
+				HookURL:     "https://hooks.slack.com/test",
+			},
+			NewTestClient(false, true),
+			true,
+			WebhookMessageTestErr,
 		},
 	}
 	for _, tt := range tests {

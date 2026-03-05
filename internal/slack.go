@@ -25,11 +25,19 @@ type slackClient interface {
 	postWebhookMessage(buildInfo BuildInfo) error
 }
 
+type slackAPI interface {
+	PostMessage(channelID string, options ...slack.MsgOption) (string, string, error)
+}
+
+var _ slackAPI = (*slack.Client)(nil)
+
 type productionSlackClientWorker struct {
+	apiFactory    func(token string) slackAPI
+	webhookPoster func(url string, msg *slack.WebhookMessage) error
 }
 
 func (client *productionSlackClientWorker) postChannelMessage(buildInfo BuildInfo) error {
-	api := slack.New(buildInfo.OauthToken)
+	api := client.apiFactory(buildInfo.OauthToken)
 	postMessage := getPostMessage(buildInfo, buildInfo.GetContextualStatus())
 	_, _, err := api.PostMessage(buildInfo.DestChannelId, postMessage...)
 	return err
@@ -37,7 +45,7 @@ func (client *productionSlackClientWorker) postChannelMessage(buildInfo BuildInf
 
 func (client *productionSlackClientWorker) postWebhookMessage(buildInfo BuildInfo) error {
 	message := getWebhookMessage(buildInfo, buildInfo.GetContextualStatus())
-	err := slack.PostWebhook(buildInfo.HookURL, &message)
+	err := client.webhookPoster(buildInfo.HookURL, &message)
 	return err
 }
 
@@ -87,7 +95,10 @@ func (client *SlackClient) PostToSlack(buildInfo BuildInfo) error {
 }
 
 func NewSlackClient() SlackClient {
-	return SlackClient{&productionSlackClientWorker{}}
+	return SlackClient{&productionSlackClientWorker{
+		apiFactory:    func(token string) slackAPI { return slack.New(token) },
+		webhookPoster: slack.PostWebhook,
+	}}
 }
 
 func getPostMessage(buildInfo BuildInfo, buildStatus Status) []slack.MsgOption {
