@@ -6,21 +6,21 @@ changelog:
       - question
       - wontfix
   categories:
-    - title: Breaking Changes
+    - title: "⚠️ Breaking Changes"
       labels:
         - breaking-change
-    - title: New Features
+    - title: "🎉 New Features"
       labels:
         - enhancement
-    - title: Bug Fixes
+    - title: "🐛 Bug Fixes"
       labels:
         - bug
-    - title: Documentation
+    - title: "📖 Documentation"
       labels:
         - documentation
-    - title: Dependency Updates
+    - title: "📦 Dependency Updates"
       labels:
         - dependabot
-    - title: Other Changes
+    - title: "🔧 Other Changes"
       labels:
         - "*"
