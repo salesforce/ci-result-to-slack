@@ -61,5 +61,45 @@ If you right-click on the channel / messages, you can hit `Copy Link` and also s
 (e.g. `https://${YOUR_WORKSPACE}.slack.com/messages/${DEST_CHANNEL_ID}`)
 
 ## Slack Incoming Webhooks
-To get the `HOOK_URL` for Incoming Webhooks, you'll follow 
+To get the `HOOK_URL` for Incoming Webhooks, you'll follow
 [Slack's Incoming Webhooks instructions](https://api.slack.com/incoming-webhooks).
+
+# Releasing
+
+Releases are triggered by pushing a tag. The [release workflow](.github/workflows/release.yml) runs
+[GoReleaser](https://goreleaser.com/) on any tag push, which builds binaries, publishes packages
+(deb/rpm/apk), and pushes the Docker image to `ghcr.io/salesforce/ci-result-to-slack`.
+Release notes are automatically generated from merged PRs using [`.github/release.yml`](.github/release.yml).
+
+## Cutting a release
+
+```sh
+git tag v1.2.3
+git push origin v1.2.3
+```
+
+## Choosing a version
+
+This project uses [semantic versioning](https://semver.org). Choose the next version based on
+what has changed since the last release:
+
+- `PATCH` (e.g. `v1.2.3`) — bug fixes, dependency bumps, documentation
+- `MINOR` (e.g. `v1.3.0`) — new backwards-compatible functionality
+- `MAJOR` (e.g. `v2.0.0`) — breaking changes
+
+To see the latest tag: `git describe --tags --abbrev=0`
+
+Optionally, [`svu`](https://github.com/caarlos0/svu) can calculate the next version automatically
+from [conventional commits](https://www.conventionalcommits.org/):
+
+```sh
+# Install
+brew install caarlos0/tap/svu
+
+# Show what the next version would be
+svu next
+
+# Tag and push
+git tag "$(svu next)"
+git push origin "$(svu next)"
+```
