@@ -1,5 +1,7 @@
 version: 2
 project_name: ci-result-to-slack
+changelog:
+  use: github-native
 builds:
   - env: [CGO_ENABLED=0]
     main: ./cmd/ci-result-to-slack
