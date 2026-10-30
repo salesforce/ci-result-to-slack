@@ -4,7 +4,7 @@ go 1.26
 
 require (
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/slack-go/slack v0.30.1
+	github.com/slack-go/slack v0.31.0
 )
 
 require github.com/gorilla/websocket v1.5.3 // indirect
